@@ -1,8 +1,8 @@
 {
   "name": "@japa/spec-reporter",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Spec reporter for japa test runner",
-   "main": "build/index.js",
+  "main": "build/index.js",
   "files": [
     "build/src",
     "build/index.d.ts",
