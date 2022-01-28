@@ -1,16 +1,37 @@
 # @japa/spec-reporter
-> Tagline
+> Spec reporter for Japa tests runner
 
 [![github-actions-image]][github-actions-url] [![npm-image]][npm-url] [![license-image]][license-url] [![typescript-image]][typescript-url]
 
-A short brief
+Spec reporter displays a detailed output for the executed tests.
+
+![](assets/spec-reporter-output.png)
 
 ## Installation
+Install the package from the npm registry as follows.
+
+```sh
+npm i -D @japa/spec-reporter
+
+# yarn
+yarn add -D @japa/spec-reporter
+```
 
 ## Usage
+You can use the spec reporter with the `@japa/runner` as follows.
 
-[github-actions-image]: https://github.com/spec-reporter/actions/workflows/test.yml
-[github-actions-url]: https://img.shields.io/github/workflow/status/spec-reporter/test?style=for-the-badge "github-actions"
+```ts
+import { configure } from '@japa/runner'
+import { specReporter } from '@japa/spec-reporter'
+
+configure({
+  reporters: [specReporter()]
+})
+```
+
+[github-actions-image]: https://img.shields.io/github/workflow/status/japa/spec-reporter/test?style=for-the-badge
+
+[github-actions-url]: https://github.com/japa/spec-reporter/actions/workflows/test.yml "github-actions"
 
 [npm-image]: https://img.shields.io/npm/v/@japa/spec-reporter.svg?style=for-the-badge&logo=npm
 [npm-url]: https://npmjs.org/package/@japa/spec-reporter "npm"

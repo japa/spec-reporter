@@ -200,9 +200,4 @@ export class SpecReporter {
       this.printSummary(summary)
     })
   }
-
-  /**
-   * Invoked by the tests runner when tests have finished
-   */
-  public close() {}
 }

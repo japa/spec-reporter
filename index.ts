@@ -7,4 +7,13 @@
  * file that was distributed with this source code.
  */
 
-export { SpecReporter } from './src/Reporter'
+import { SpecReporter } from './src/Reporter'
+export { SpecReporter }
+
+/**
+ * Spec reporter plugin function
+ */
+export function specReporter() {
+  const reporter = new SpecReporter()
+  return reporter.open.bind(reporter)
+}
