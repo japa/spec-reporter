@@ -8,6 +8,7 @@
  */
 
 import ms from 'ms'
+import { pope } from 'pope'
 import { icons, logger } from '@poppinss/cliui'
 import { ErrorsPrinter } from '@japa/errors-printer'
 import { Emitter, Runner, GroupStartNode, TestEndNode } from '@japa/core'
@@ -48,31 +49,35 @@ export class SpecReporter {
    * Returns the test message
    */
   private getTestMessage(payload: TestEndNode) {
+    const message = pope(payload.title, payload)
+
     if (payload.isTodo) {
-      return logger.colors.cyan(payload.title)
+      return logger.colors.blue(message)
     }
 
     if (payload.isFailing) {
-      return payload.hasError
-        ? logger.colors.magenta(payload.title)
-        : logger.colors.red(payload.title)
+      return payload.hasError ? logger.colors.magenta(message) : logger.colors.red(message)
     }
 
     if (payload.hasError) {
-      return logger.colors.red(payload.title)
+      return logger.colors.red(message)
     }
 
     if (payload.isSkipped) {
-      return logger.colors.yellow(payload.title)
+      return logger.colors.yellow(message)
     }
 
-    return logger.colors.grey(payload.title)
+    return logger.colors.grey(message)
   }
 
   /**
-   * Returns the subtext message for regression test
+   * Returns the subtext message for the test
    */
-  private getRegressionMessage(payload: TestEndNode): string | undefined {
+  private getSubText(payload: TestEndNode): string | undefined {
+    if (payload.isSkipped && payload.skipReason) {
+      return logger.colors.yellow(payload.skipReason)
+    }
+
     if (!payload.isFailing) {
       return
     }
@@ -100,10 +105,10 @@ export class SpecReporter {
     const indentation = this.currentGroupTitle ? '  ' : ''
     const duration = logger.colors.dim(`(${ms(payload.duration)})`)
 
-    let regressionMessage = this.getRegressionMessage(payload)
-    regressionMessage = regressionMessage ? `\n${indentation}  ${regressionMessage}` : ''
+    let subText = this.getSubText(payload)
+    subText = subText ? `\n${indentation}   ${subText}` : ''
 
-    console.log(`${indentation}${icon} ${message} ${duration}${regressionMessage}`)
+    console.log(`${indentation}${icon}  ${message} ${duration}${subText}`)
   }
 
   /**
@@ -114,7 +119,7 @@ export class SpecReporter {
 
     const title =
       this.currentSuiteTitle !== 'default'
-        ? `${this.currentSuiteTitle} | ${payload.title}`
+        ? `${this.currentSuiteTitle} / ${payload.title}`
         : payload.title
 
     console.log(`\n${title}`)
@@ -156,11 +161,9 @@ export class SpecReporter {
     const errorPrinter = new ErrorsPrinter()
 
     /**
-     * Tests runner has errors
+     * Tests runner errors
      */
-    if (summary.runnerErrors.length) {
-      await errorPrinter.printErrors('Tests Runner', summary.runnerErrors)
-    }
+    await errorPrinter.printErrors('Tests Runner', summary.runnerErrors)
 
     /**
      * Printing the errors tree
