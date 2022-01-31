@@ -142,9 +142,9 @@ export class SpecReporter {
     console.log('')
 
     if (summary.hasError) {
-      console.log(logger.colors.bgRed().white(' FAILED '))
+      console.log(logger.colors.bgRed().black(' FAILED '))
     } else {
-      console.log(logger.colors.bgGreen().white(' PASSED '))
+      console.log(logger.colors.bgGreen().black(' PASSED '))
     }
     console.log('')
 
@@ -163,8 +163,10 @@ export class SpecReporter {
     )
     this.printAggregate('duration', ms(summary.duration), aggregatesWhiteSpace)
 
-    console.log('')
-    console.log('')
+    if (summary.failureTree.length || this.uncaughtExceptions.length) {
+      console.log('')
+      console.log('')
+    }
 
     const errorPrinter = new ErrorsPrinter()
 
