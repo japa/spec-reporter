@@ -19,6 +19,7 @@ import { Emitter, Runner, GroupStartNode, TestEndNode } from '@japa/core'
 export class SpecReporter {
   private currentSuiteTitle?: string
   private currentGroupTitle?: string
+  private uncaughtExceptions: { phase: 'test'; error: Error }[] = []
 
   /**
    * Returns the icon for the test
@@ -128,9 +129,9 @@ export class SpecReporter {
   /**
    * Print the aggregate count
    */
-  private printAggregate(label: string, count: number) {
+  private printAggregate(label: string, count: number, whitespaceLength: number) {
     if (count) {
-      console.log(logger.colors.dim(`${label.padEnd(13)} : ${count}`))
+      console.log(logger.colors.dim(`${label.padEnd(whitespaceLength + 2)} : ${count}`))
     }
   }
 
@@ -147,23 +148,25 @@ export class SpecReporter {
     }
     console.log('')
 
-    this.printAggregate('total', summary.total)
-    this.printAggregate('failed', summary.failed)
-    this.printAggregate('passed', summary.passed)
-    this.printAggregate('todo', summary.todo)
-    this.printAggregate('skipped', summary.skipped)
-    this.printAggregate('regression', summary.regression)
-    this.printAggregate('duration', ms(summary.duration))
+    const aggregatesWhiteSpace = summary.aggregates.uncaughtExceptions ? 19 : 10
+
+    this.printAggregate('total', summary.aggregates.total, aggregatesWhiteSpace)
+    this.printAggregate('failed', summary.aggregates.failed, aggregatesWhiteSpace)
+    this.printAggregate('passed', summary.aggregates.passed, aggregatesWhiteSpace)
+    this.printAggregate('todo', summary.aggregates.todo, aggregatesWhiteSpace)
+    this.printAggregate('skipped', summary.aggregates.skipped, aggregatesWhiteSpace)
+    this.printAggregate('regression', summary.aggregates.regression, aggregatesWhiteSpace)
+    this.printAggregate(
+      'uncaught exceptions',
+      summary.aggregates.uncaughtExceptions,
+      aggregatesWhiteSpace
+    )
+    this.printAggregate('duration', ms(summary.duration), aggregatesWhiteSpace)
 
     console.log('')
     console.log('')
 
     const errorPrinter = new ErrorsPrinter()
-
-    /**
-     * Tests runner errors
-     */
-    await errorPrinter.printErrors('Tests Runner', summary.runnerErrors)
 
     /**
      * Printing the errors tree
@@ -182,6 +185,11 @@ export class SpecReporter {
         }
       }
     }
+
+    /**
+     * Uncaught exceptions
+     */
+    await errorPrinter.printErrors('Uncaught exception', this.uncaughtExceptions)
   }
 
   /**
@@ -189,15 +197,18 @@ export class SpecReporter {
    */
   public open(runner: Runner, emitter: Emitter) {
     emitter.on('test:end', (payload) => this.printTest(payload))
+    emitter.on('uncaught:exception', async (error) => {
+      this.uncaughtExceptions.push({ phase: 'test', error })
+    })
     emitter.on('group:start', (payload) => this.printGroup(payload))
     emitter.on('group:end', () => (this.currentGroupTitle = undefined))
     emitter.on('suite:start', (payload) => {
       this.currentSuiteTitle = payload.name
     })
     emitter.on('suite:end', () => (this.currentSuiteTitle = undefined))
-    emitter.on('runner:end', () => {
+    emitter.on('runner:end', async () => {
       const summary = runner.getSummary()
-      this.printSummary(summary)
+      await this.printSummary(summary)
     })
   }
 }
