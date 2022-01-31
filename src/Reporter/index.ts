@@ -11,7 +11,7 @@ import ms from 'ms'
 import { pope } from 'pope'
 import { icons, logger } from '@poppinss/cliui'
 import { ErrorsPrinter } from '@japa/errors-printer'
-import { Emitter, Runner, GroupStartNode, TestEndNode } from '@japa/core'
+import type { Emitter, Runner, GroupStartNode, TestEndNode } from '@japa/core'
 
 /**
  * Pretty prints the tests on the console
