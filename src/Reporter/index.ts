@@ -9,6 +9,7 @@
 
 import ms from 'ms'
 import { pope } from 'pope'
+import { relative } from 'path'
 import { icons, logger } from '@poppinss/cliui'
 import { ErrorsPrinter } from '@japa/errors-printer'
 import type { Emitter, Runner, GroupStartNode, TestEndNode } from '@japa/core'
@@ -17,8 +18,10 @@ import type { Emitter, Runner, GroupStartNode, TestEndNode } from '@japa/core'
  * Pretty prints the tests on the console
  */
 export class SpecReporter {
-  private currentSuiteTitle?: string
+  private currentSuiteName?: string
+  private currentFileName?: string
   private currentGroupTitle?: string
+  private currentTestTitle?: string
   private uncaughtExceptions: { phase: 'test'; error: Error }[] = []
 
   /**
@@ -98,32 +101,44 @@ export class SpecReporter {
   }
 
   /**
+   * Returns the filename relative from the current working dir
+   */
+  private getRelativeFilename(fileName: string) {
+    return relative(process.cwd(), fileName)
+  }
+
+  /**
    * Prints the test details
    */
   private printTest(payload: TestEndNode) {
     const icon = this.getTestIcon(payload)
     const message = this.getTestMessage(payload)
-    const indentation = this.currentGroupTitle ? '  ' : ''
+    const indentation = this.currentFileName || this.currentGroupTitle ? '  ' : ''
     const duration = logger.colors.dim(`(${ms(payload.duration)})`)
 
     let subText = this.getSubText(payload)
-    subText = subText ? `\n${indentation}   ${subText}` : ''
+    subText = subText ? `\n${indentation}  ${subText}` : ''
 
-    console.log(`${indentation}${icon}  ${message} ${duration}${subText}`)
+    console.log(`${indentation}${icon} ${message} ${duration}${subText}`)
   }
 
   /**
    * Prints the group name
    */
   private printGroup(payload: GroupStartNode) {
+    this.currentFileName = payload.meta.fileName
     this.currentGroupTitle = payload.title
 
     const title =
-      this.currentSuiteTitle !== 'default'
-        ? `${this.currentSuiteTitle} / ${payload.title}`
+      this.currentSuiteName !== 'default'
+        ? `${this.currentSuiteName} / ${payload.title}`
         : payload.title
 
-    console.log(`\n${title}`)
+    const suffix = this.currentFileName
+      ? logger.colors.dim(` (${this.getRelativeFilename(this.currentFileName)})`)
+      : ''
+
+    console.log(`\n${title}${suffix}`)
   }
 
   /**
@@ -198,16 +213,48 @@ export class SpecReporter {
    * Invoked by the tests runner when tests are about to start
    */
   public open(runner: Runner, emitter: Emitter) {
-    emitter.on('test:end', (payload) => this.printTest(payload))
+    emitter.on('test:start', (payload) => {
+      this.currentFileName = payload.meta.fileName
+
+      /**
+       * Display the filename when
+       *
+       * - The filename exists
+       * - The test is not under a group
+       * - Test is first in a sequence
+       */
+      if (payload.meta.fileName && !this.currentGroupTitle && !this.currentTestTitle) {
+        console.log(`\n${logger.colors.dim(this.getRelativeFilename(this.currentFileName!))}`)
+      }
+
+      this.currentTestTitle = payload.title
+    })
+
+    emitter.on('test:end', (payload) => {
+      this.printTest(payload)
+      this.currentTestTitle = undefined
+    })
+
+    emitter.on('group:start', (payload) => {
+      this.printGroup(payload)
+    })
+
+    emitter.on('group:end', () => {
+      this.currentGroupTitle = undefined
+    })
+
+    emitter.on('suite:start', (payload) => {
+      this.currentSuiteName = payload.name
+    })
+
+    emitter.on('suite:end', () => {
+      this.currentSuiteName = undefined
+    })
+
     emitter.on('uncaught:exception', async (error) => {
       this.uncaughtExceptions.push({ phase: 'test', error })
     })
-    emitter.on('group:start', (payload) => this.printGroup(payload))
-    emitter.on('group:end', () => (this.currentGroupTitle = undefined))
-    emitter.on('suite:start', (payload) => {
-      this.currentSuiteTitle = payload.name
-    })
-    emitter.on('suite:end', () => (this.currentSuiteTitle = undefined))
+
     emitter.on('runner:end', async () => {
       const summary = runner.getSummary()
       await this.printSummary(summary)
