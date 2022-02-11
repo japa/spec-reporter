@@ -156,6 +156,11 @@ export class SpecReporter {
   private async printSummary(summary: ReturnType<Runner<any>['getSummary']>) {
     console.log('')
 
+    if (summary.aggregates.total === 0) {
+      console.log(logger.colors.bgYellow().black(' NO TESTS EXECUTED '))
+      return
+    }
+
     if (summary.hasError) {
       console.log(logger.colors.bgRed().black(' FAILED '))
     } else {
