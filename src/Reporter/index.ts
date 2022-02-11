@@ -153,7 +153,7 @@ export class SpecReporter {
   /**
    * Print tests summary
    */
-  private async printSummary(summary: ReturnType<Runner['getSummary']>) {
+  private async printSummary(summary: ReturnType<Runner<any>['getSummary']>) {
     console.log('')
 
     if (summary.hasError) {
@@ -212,7 +212,7 @@ export class SpecReporter {
   /**
    * Invoked by the tests runner when tests are about to start
    */
-  public open(runner: Runner, emitter: Emitter) {
+  public open(runner: Runner<any>, emitter: Emitter) {
     emitter.on('test:start', (payload) => {
       this.currentFileName = payload.meta.fileName
 
