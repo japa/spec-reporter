@@ -11,7 +11,7 @@ import { SpecReporter } from './src/Reporter'
 export { SpecReporter }
 
 /**
- * Spec reporter plugin function
+ * Spec reporter function
  */
 export function specReporter() {
   const reporter = new SpecReporter()
