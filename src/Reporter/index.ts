@@ -22,6 +22,7 @@ export class SpecReporter {
   private currentFileName?: string
   private currentGroupTitle?: string
   private currentTestTitle?: string
+  private groupPayload?: GroupStartNode
   private uncaughtExceptions: { phase: 'test'; error: Error }[] = []
 
   /**
@@ -222,6 +223,14 @@ export class SpecReporter {
       this.currentFileName = payload.meta.fileName
 
       /**
+       * Print the group title
+       */
+      if (this.groupPayload) {
+        this.printGroup(this.groupPayload)
+        this.groupPayload = undefined
+      }
+
+      /**
        * Display the filename when
        *
        * - The filename exists
@@ -241,11 +250,12 @@ export class SpecReporter {
     })
 
     emitter.on('group:start', (payload) => {
-      this.printGroup(payload)
+      this.groupPayload = payload
     })
 
     emitter.on('group:end', () => {
       this.currentGroupTitle = undefined
+      this.groupPayload = undefined
     })
 
     emitter.on('suite:start', (payload) => {
