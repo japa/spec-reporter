@@ -53,7 +53,7 @@ export class SpecReporter {
    * Returns the test message
    */
   private getTestMessage(payload: TestEndNode) {
-    const message = payload.title.expanded
+    const message = typeof payload.title === 'string' ? payload.title : payload.title.expanded
 
     if (payload.isTodo) {
       return logger.colors.blue(message)
@@ -244,7 +244,8 @@ export class SpecReporter {
         console.log(`\n${logger.colors.dim(this.getRelativeFilename(this.currentFileName!))}`)
       }
 
-      this.currentTestTitle = payload.title.expanded
+      this.currentTestTitle =
+        typeof payload.title === 'string' ? payload.title : payload.title.expanded
     })
 
     emitter.on('test:end', (payload) => {
