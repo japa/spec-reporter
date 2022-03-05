@@ -8,7 +8,6 @@
  */
 
 import ms from 'ms'
-import { pope } from 'pope'
 import { relative } from 'path'
 import { icons, logger } from '@poppinss/cliui'
 import { ErrorsPrinter } from '@japa/errors-printer'
@@ -54,7 +53,7 @@ export class SpecReporter {
    * Returns the test message
    */
   private getTestMessage(payload: TestEndNode) {
-    const message = pope(payload.title, payload)
+    const message = payload.title.expanded
 
     if (payload.isTodo) {
       return logger.colors.blue(message)
@@ -116,11 +115,15 @@ export class SpecReporter {
     const message = this.getTestMessage(payload)
     const indentation = this.currentFileName || this.currentGroupTitle ? '  ' : ''
     const duration = logger.colors.dim(`(${ms(payload.duration)})`)
+    const retries =
+      payload.retryAttempt && payload.retryAttempt > 1
+        ? logger.colors.dim(`(x${payload.retryAttempt}) `)
+        : ''
 
     let subText = this.getSubText(payload)
     subText = subText ? `\n${indentation}  ${subText}` : ''
 
-    console.log(`${indentation}${icon} ${message} ${duration}${subText}`)
+    console.log(`${indentation}${icon} ${retries}${message} ${duration}${subText}`)
   }
 
   /**
@@ -241,7 +244,7 @@ export class SpecReporter {
         console.log(`\n${logger.colors.dim(this.getRelativeFilename(this.currentFileName!))}`)
       }
 
-      this.currentTestTitle = payload.title
+      this.currentTestTitle = payload.title.expanded
     })
 
     emitter.on('test:end', (payload) => {
