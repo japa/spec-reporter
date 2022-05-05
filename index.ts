@@ -7,13 +7,14 @@
  * file that was distributed with this source code.
  */
 
+import type { SpecReporterOptions } from './src/Contracts'
 import { SpecReporter } from './src/Reporter'
 export { SpecReporter }
 
 /**
  * Spec reporter function
  */
-export function specReporter() {
-  const reporter = new SpecReporter()
+export function specReporter(options: Partial<SpecReporterOptions> = {}) {
+  const reporter = new SpecReporter(options)
   return reporter.open.bind(reporter)
 }

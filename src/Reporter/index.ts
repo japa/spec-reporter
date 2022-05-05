@@ -11,18 +11,26 @@ import ms from 'ms'
 import { relative } from 'path'
 import { icons, logger } from '@poppinss/cliui'
 import { ErrorsPrinter } from '@japa/errors-printer'
+import type { SpecReporterOptions } from '../Contracts'
 import type { Emitter, Runner, GroupStartNode, TestEndNode } from '@japa/core'
 
 /**
  * Pretty prints the tests on the console
  */
 export class SpecReporter {
+  private options: SpecReporterOptions
   private currentSuiteName?: string
   private currentFileName?: string
   private currentGroupTitle?: string
   private currentTestTitle?: string
   private groupPayload?: GroupStartNode
   private uncaughtExceptions: { phase: 'test'; error: Error }[] = []
+
+  constructor(options: Partial<SpecReporterOptions> = {}) {
+    this.options = {
+      stackLinesCount: options.stackLinesCount || 5,
+    }
+  }
 
   /**
    * Returns the icon for the test
@@ -192,7 +200,9 @@ export class SpecReporter {
       console.log('')
     }
 
-    const errorPrinter = new ErrorsPrinter()
+    const errorPrinter = new ErrorsPrinter({
+      stackLinesCount: this.options.stackLinesCount,
+    })
 
     /**
      * Printing the errors tree
