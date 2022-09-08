@@ -16,5 +16,5 @@ export { SpecReporter }
  */
 export function specReporter(options: Partial<SpecReporterOptions> = {}) {
   const reporter = new SpecReporter(options)
-  return reporter.open.bind(reporter)
+  return reporter.boot.bind(reporter)
 }
