@@ -16,5 +16,8 @@ export { SpecReporter }
  */
 export function specReporter(options: Partial<SpecReporterOptions> = {}) {
   const reporter = new SpecReporter(options)
-  return reporter.boot.bind(reporter)
+  return {
+    name: 'spec' as const,
+    handler: reporter.boot.bind(reporter),
+  }
 }

@@ -5,7 +5,7 @@ import { specReporter } from '../index'
 const emitter = new Emitter()
 const runner = new Runner(emitter)
 
-specReporter()(runner, emitter)
+specReporter().handler(runner, emitter)
 runner['boot']()
 
 fire(emitter)
