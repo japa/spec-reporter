@@ -108,7 +108,7 @@
     "anyBranch": false
   },
   "dependencies": {
-    "@japa/base-reporter": "^1.0.3",
+    "@japa/base-reporter": "^1.1.0",
     "@japa/errors-printer": "^2.0.1",
     "@poppinss/cliui": "^3.0.4",
     "ms": "^2.1.3"
