@@ -120,6 +120,7 @@ export class SpecReporter extends BaseReporter {
   private printTest(payload: TestEndNode) {
     const icon = this.getTestIcon(payload)
     const message = this.getTestMessage(payload)
+    const prefix = payload.isPinned ? logger.colors.yellow('[PINNED] ') : ''
     const indentation = this.currentFileName || this.currentGroupTitle ? '  ' : ''
     const duration = logger.colors.dim(`(${ms(payload.duration)})`)
     const retries =
@@ -130,7 +131,7 @@ export class SpecReporter extends BaseReporter {
     let subText = this.getSubText(payload)
     subText = subText ? `\n${indentation}  ${subText}` : ''
 
-    console.log(`${indentation}${icon} ${retries}${message} ${duration}${subText}`)
+    console.log(`${indentation}${icon} ${prefix}${retries}${message} ${duration}${subText}`)
   }
 
   /**
