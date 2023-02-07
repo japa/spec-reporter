@@ -1,7 +1,7 @@
 /*
  * @japa/spec-reporter
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa.dev
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,7 @@ import { icons, logger } from '@poppinss/cliui'
 import { BaseReporter } from '@japa/base-reporter'
 import type { GroupStartNode, TestEndNode } from '@japa/core'
 
-import type { SpecReporterOptions } from '../Contracts'
+import type { SpecReporterOptions } from './types'
 
 /**
  * Pretty prints the tests on the console

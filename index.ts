@@ -1,14 +1,14 @@
 /*
  * @japa/spec-reporter
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa.dev
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import type { SpecReporterOptions } from './src/Contracts'
-import { SpecReporter } from './src/Reporter'
+import type { SpecReporterOptions } from './src/types'
+import { SpecReporter } from './src/reporter'
 export { SpecReporter }
 
 /**

@@ -39,6 +39,7 @@
     "@adonisjs/require-ts": "^2.0.13",
     "@japa/core": "^7.3.1",
     "@japa/synthetic-events": "^2.0.2",
+    "@types/ms": "^0.7.31",
     "@types/node": "^18.13.0",
     "commitizen": "^4.3.0",
     "cz-conventional-changelog": "^3.3.0",
