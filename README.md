@@ -29,7 +29,7 @@ configure({
 })
 ```
 
-[github-actions-image]: https://img.shields.io/github/workflow/status/japa/spec-reporter/test?style=for-the-badge
+[github-actions-image]: https://img.shields.io/github/actions/workflow/status/japa/spec-reporter/test.yml?style=for-the-badge
 
 [github-actions-url]: https://github.com/japa/spec-reporter/actions/workflows/test.yml "github-actions"
 
